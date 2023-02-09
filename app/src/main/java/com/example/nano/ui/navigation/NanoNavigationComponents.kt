@@ -1,38 +1,14 @@
 package com.example.nano.ui.navigation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MenuOpen
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.PermanentDrawerSheet
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +33,6 @@ fun NanoNavigationRail(
         modifier = Modifier.fillMaxHeight(),
         containerColor = MaterialTheme.colorScheme.inverseOnSurface
     ) {
-        // TODO remove custom nav rail positioning when NavRail component supports it. ticket : b/232495216
         Layout(
             modifier = Modifier.widthIn(max = 80.dp),
             content = {
@@ -103,7 +78,9 @@ fun NanoNavigationRail(
                             onClick = { navigateToTopLevelDestination(nanoDestination) },
                             icon = {
                                 Icon(
-                                    imageVector = nanoDestination.selectedIcon,
+                                    imageVector = if (selectedDestination == nanoDestination.route)
+                                        nanoDestination.selectedIcon
+                                    else nanoDestination.unselectedIcon,
                                     contentDescription = stringResource(
                                         id = nanoDestination.iconTextId
                                     )
@@ -129,19 +106,13 @@ fun NanoNavigationRail(
                     constraints.offset(vertical = -headerPlaceable.height)
                 )
                 layout(constraints.maxWidth, constraints.maxHeight) {
-                    // Place the header, this goes at the top
                     headerPlaceable.placeRelative(0, 0)
-
-                    // Determine how much space is not taken up by the content
                     val nonContentVerticalSpace = constraints.maxHeight - contentPlaceable.height
 
                     val contentPlaceableY = when (navigationContentPosition) {
-                        // Figure out the place we want to place the content, with respect to the
-                        // parent (ignoring the header for now)
                         NanoNavigationContentPosition.TOP -> 0
                         NanoNavigationContentPosition.CENTER -> nonContentVerticalSpace / 2
                     }
-                        // And finally, make sure we don't overlap with the header.
                         .coerceAtLeast(headerPlaceable.height)
 
                     contentPlaceable.placeRelative(0, contentPlaceableY)
@@ -163,7 +134,9 @@ fun NanoBottomNavigationBar(
                 onClick = { navigateToTopLevelDestination(nanoDestination) },
                 icon = {
                     Icon(
-                        imageVector = nanoDestination.selectedIcon,
+                        imageVector = if (selectedDestination == nanoDestination.route)
+                            nanoDestination.selectedIcon
+                        else nanoDestination.unselectedIcon,
                         contentDescription = stringResource(id = nanoDestination.iconTextId)
                     )
                 }
@@ -180,7 +153,6 @@ fun PermanentNavigationDrawerContent(
     navigateToTopLevelDestination: (NanoTopLevelDestination) -> Unit,
 ) {
     PermanentDrawerSheet(modifier = Modifier.sizeIn(minWidth = 200.dp, maxWidth = 300.dp)) {
-        // TODO remove custom nav drawer content positioning when NavDrawer component supports it. ticket : b/232495216
         Layout(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.inverseOnSurface)
@@ -236,7 +208,7 @@ fun PermanentNavigationDrawerContent(
                             },
                             icon = {
                                 Icon(
-                                    imageVector = nanoDestination.selectedIcon,
+                                    imageVector = if (selectedDestination == nanoDestination.route) nanoDestination.selectedIcon else nanoDestination.unselectedIcon,
                                     contentDescription = stringResource(
                                         id = nanoDestination.iconTextId
                                     )
@@ -266,19 +238,13 @@ fun PermanentNavigationDrawerContent(
                     constraints.offset(vertical = -headerPlaceable.height)
                 )
                 layout(constraints.maxWidth, constraints.maxHeight) {
-                    // Place the header, this goes at the top
                     headerPlaceable.placeRelative(0, 0)
-
-                    // Determine how much space is not taken up by the content
                     val nonContentVerticalSpace = constraints.maxHeight - contentPlaceable.height
 
                     val contentPlaceableY = when (navigationContentPosition) {
-                        // Figure out the place we want to place the content, with respect to the
-                        // parent (ignoring the header for now)
                         NanoNavigationContentPosition.TOP -> 0
                         NanoNavigationContentPosition.CENTER -> nonContentVerticalSpace / 2
                     }
-                        // And finally, make sure we don't overlap with the header.
                         .coerceAtLeast(headerPlaceable.height)
 
                     contentPlaceable.placeRelative(0, contentPlaceableY)
@@ -297,7 +263,6 @@ fun ModalNavigationDrawerContent(
     onDrawerClicked: () -> Unit = {}
 ) {
     ModalDrawerSheet {
-        // TODO remove custom nav drawer content positioning when NavDrawer component supports it. ticket : b/232495216
         Layout(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.inverseOnSurface)
@@ -366,7 +331,7 @@ fun ModalNavigationDrawerContent(
                             },
                             icon = {
                                 Icon(
-                                    imageVector = nanoDestination.selectedIcon,
+                                    imageVector = if (selectedDestination == nanoDestination.route) nanoDestination.selectedIcon else nanoDestination.unselectedIcon,
                                     contentDescription = stringResource(
                                         id = nanoDestination.iconTextId
                                     )
@@ -396,19 +361,13 @@ fun ModalNavigationDrawerContent(
                     constraints.offset(vertical = -headerPlaceable.height)
                 )
                 layout(constraints.maxWidth, constraints.maxHeight) {
-                    // Place the header, this goes at the top
                     headerPlaceable.placeRelative(0, 0)
-
-                    // Determine how much space is not taken up by the content
                     val nonContentVerticalSpace = constraints.maxHeight - contentPlaceable.height
 
                     val contentPlaceableY = when (navigationContentPosition) {
-                        // Figure out the place we want to place the content, with respect to the
-                        // parent (ignoring the header for now)
                         NanoNavigationContentPosition.TOP -> 0
                         NanoNavigationContentPosition.CENTER -> nonContentVerticalSpace / 2
                     }
-                        // And finally, make sure we don't overlap with the header.
                         .coerceAtLeast(headerPlaceable.height)
 
                     contentPlaceable.placeRelative(0, contentPlaceableY)

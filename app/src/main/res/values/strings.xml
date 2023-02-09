@@ -1,19 +1,19 @@
 <resources>
     <string name="app_name">Nano</string>
-    <string name="navigation_drawer">Navigation Drawer</string>
-    <string name="tab_inbox">Inbox</string>
-    <string name="tab_article">Articles</string>
-    <string name="tab_dm">Direct Messages</string>
-    <string name="tab_groups">Groups</string>
+    <string name="navigation_drawer">导航栏</string>
+    <string name="tab_inbox">收件箱</string>
+    <string name="tab_article">消息</string>
+    <string name="tab_dm">聊天</string>
+    <string name="tab_groups">群组</string>
 
-    <string name="profile">Profile</string>
-    <string name="search">Search</string>
+    <string name="profile">设置</string>
+    <string name="search">检索</string>
     <string name="search_replies">Search replies</string>
-    <string name="reply">Reply</string>
-    <string name="reply_all">Reply All</string>
+    <string name="reply">回复</string>
+    <string name="reply_all">回复所有</string>
 
-    <string name="edit">Edit</string>
-    <string name="compose">Compose</string>
+    <string name="edit">新建</string>
+    <string name="compose">新建</string>
 
     <string name="empty_screen_title">Screen under construction</string>
     <string name="empty_screen_subtitle">This screen is still under construction. This sample will help you learn about adaptive layouts in Jetpack Compose</string>
