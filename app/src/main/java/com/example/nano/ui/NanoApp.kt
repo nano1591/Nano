@@ -2,9 +2,7 @@ package com.example.nano.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
@@ -110,6 +108,7 @@ private fun NanoNavigationWrapper(
                 selectedDestination = selectedDestination,
                 navigationContentPosition = navigationContentPosition,
                 navigateToTopLevelDestination = navigationActions::navigateTo,
+                onFABClicked = { }
             )
         }) {
             NanoAppContent(
@@ -131,7 +130,17 @@ private fun NanoNavigationWrapper(
                 ModalNavigationDrawerContent(
                     selectedDestination = selectedDestination,
                     navigationContentPosition = navigationContentPosition,
-                    navigateToTopLevelDestination = navigationActions::navigateTo,
+                    onFABClicked = {
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    },
+                    navigateToTopLevelDestination = { destination ->
+                        navigationActions.navigateTo(destination)
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    },
                     onDrawerClicked = {
                         scope.launch {
                             drawerState.close()
@@ -151,7 +160,8 @@ private fun NanoNavigationWrapper(
                 selectedDestination = selectedDestination,
                 navigateToTopLevelDestination = navigationActions::navigateTo,
                 closeDetailScreen = closeDetailScreen,
-                navigateToDetail = navigateToDetail
+                navigateToDetail = navigateToDetail,
+                onFABClicked = {}
             ) {
                 scope.launch {
                     drawerState.open()
@@ -174,6 +184,7 @@ fun NanoAppContent(
     navigateToTopLevelDestination: (NanoTopLevelDestination) -> Unit,
     closeDetailScreen: () -> Unit,
     navigateToDetail: (Long, NanoContentType) -> Unit,
+    onFABClicked: () -> Unit = {},
     onDrawerClicked: () -> Unit = {}
 ) {
     Row(modifier = modifier.fillMaxSize()) {
@@ -198,6 +209,7 @@ fun NanoAppContent(
                 navigationType = navigationType,
                 closeDetailScreen = closeDetailScreen,
                 navigateToDetail = navigateToDetail,
+                onFABClicked = onFABClicked,
                 modifier = Modifier.weight(1f),
             )
             AnimatedVisibility(visible = navigationType == NanoNavigationType.BOTTOM_NAVIGATION) {
@@ -212,6 +224,7 @@ fun NanoAppContent(
 
 @Composable
 private fun NanoNavHost(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
     contentType: NanoContentType,
     displayFeatures: List<DisplayFeature>,
@@ -219,7 +232,7 @@ private fun NanoNavHost(
     navigationType: NanoNavigationType,
     closeDetailScreen: () -> Unit,
     navigateToDetail: (Long, NanoContentType) -> Unit,
-    modifier: Modifier = Modifier,
+    onFABClicked: () -> Unit = {}
 ) {
     NavHost(
         modifier = modifier,
