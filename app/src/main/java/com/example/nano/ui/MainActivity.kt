@@ -13,7 +13,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.nano.mvi.collectState
 import com.example.nano.ui.theme.NanoTheme
+import com.example.nano.ui.utils.toast
 import com.example.nano.ui.viewModel.NanoHomeUIState
 import com.example.nano.ui.viewModel.NanoHomeViewModel
 import com.google.accompanist.adaptive.calculateDisplayFeatures
@@ -29,8 +31,14 @@ class MainActivity : ComponentActivity() {
             NanoTheme {
                 val windowSize = calculateWindowSizeClass(this)
                 val displayFeatures = calculateDisplayFeatures(this)
-                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
+                val uiState by viewModel.container.uiStateFlow.collectAsStateWithLifecycle()
+                viewModel.container.run {
+                    uiStateFlow.collectState(this@MainActivity) {
+                        collectPartial(NanoHomeUIState::loading) { loading ->
+                            "uiState: $loading".toast(this@MainActivity)
+                        }
+                    }
+                }
                 NanoApp(
                     windowSize = windowSize,
                     displayFeatures = displayFeatures,
