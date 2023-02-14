@@ -1,0 +1,28 @@
+将本地数据流和网络数据流异步合并发出，
+我看博主采用了一些技巧去处理，
+这里其实有另外一个处理方式，
+唯一可信数据源，
+其实可以这么考虑，
+我们只认为本地数据库的数据是唯一可信数据源，
+那么网络数据请求下来之后，
+保存到本地数据库就行了，
+本地数据库对外提供flow，viewmodel或者ui订阅数据库flow就形成了唯一数据。
+这个是官方上面有提到的一种做法
+
+
+大受启发，给大佬点个赞。鄙人感觉还可以再优化，
+比如事件流的订阅里，一个个 is 判断的不仅看着都眼花，
+而且要想知道SearchSingleEvent.ToastEventSearch到底做了什么，还要去when里面找。
+我先抛砖引玉说一下我改的方案，我在UiSingleEvent接口里加了个
+suspend fun invoke(_viewState: MutableStateFlow<STATE>)，
+这样UiSingleEvent的子类就可以直接覆写invoke方法。
+而事件的订阅就放在RealContainer的init里,
+通过反射获取内部类再遍历通过类名，
+判断是否调用invoke方法。
+这种方式取代了when 和 is的判断，
+ToastEventSearch要做了什么就在它写的invoke方法里，一目了然。
+再比如View层发送事件，是通过
+viewModel.container.sendEvent(SearchSingleEvent.ToastEventSearch)
+发送事件，我创了个SentEventDelegate委托类通过setValue来调用sendEvent，效果是
+var easyEvent by SentEventDelegate(viewModel.container)//委托
+easyEvent=SearchSingleEvent.ToastEventSearch //调用发送事件
