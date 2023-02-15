@@ -20,18 +20,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.layout.DisplayFeature
 import com.example.nano.ui.navigation.*
-import com.example.nano.ui.viewModel.NanoHomeUIState
 import kotlinx.coroutines.launch
 import com.example.nano.R
+import com.example.nano.ui.home.NanoHomeRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NanoApp(
     windowSize: WindowSizeClass,
-    displayFeatures: List<DisplayFeature>,
-    nanoHomeUIState: NanoHomeUIState,
-    closeDetailScreen: () -> Unit = {},
-    navigateToDetail: (Long, NanoContentType) -> Unit = { _, _ -> }
+    displayFeatures: List<DisplayFeature>
 ) {
     val navigationType: NanoNavigationType
     val contentType: NanoContentType
@@ -72,10 +69,7 @@ fun NanoApp(
         navigationType = navigationType,
         contentType = contentType,
         displayFeatures = displayFeatures,
-        navigationContentPosition = navigationContentPosition,
-        nanoHomeUIState = nanoHomeUIState,
-        closeDetailScreen = closeDetailScreen,
-        navigateToDetail = navigateToDetail
+        navigationContentPosition = navigationContentPosition
     )
 }
 
@@ -86,10 +80,7 @@ private fun NanoNavigationWrapper(
     navigationType: NanoNavigationType,
     contentType: NanoContentType,
     displayFeatures: List<DisplayFeature>,
-    navigationContentPosition: NanoNavigationContentPosition,
-    nanoHomeUIState: NanoHomeUIState,
-    closeDetailScreen: () -> Unit,
-    navigateToDetail: (Long, NanoContentType) -> Unit
+    navigationContentPosition: NanoNavigationContentPosition
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -102,13 +93,17 @@ private fun NanoNavigationWrapper(
     val selectedDestination =
         navBackStackEntry?.destination?.route ?: NanoRoute.INBOX
 
+    val closeDetailScreen: () -> Unit = {}
+    val navigateToDetail: (Long, NanoContentType) -> Unit = { _, _ -> }
+    val onFABClicked: () -> Unit = {}
+
     if (navigationType == NanoNavigationType.PERMANENT_NAVIGATION_DRAWER) {
         PermanentNavigationDrawer(drawerContent = {
             PermanentNavigationDrawerContent(
                 selectedDestination = selectedDestination,
                 navigationContentPosition = navigationContentPosition,
                 navigateToTopLevelDestination = navigationActions::navigateTo,
-                onFABClicked = { }
+                onFABClicked = onFABClicked
             )
         }) {
             NanoAppContent(
@@ -116,7 +111,6 @@ private fun NanoNavigationWrapper(
                 contentType = contentType,
                 displayFeatures = displayFeatures,
                 navigationContentPosition = navigationContentPosition,
-                nanoHomeUIState = nanoHomeUIState,
                 navController = navController,
                 selectedDestination = selectedDestination,
                 navigateToTopLevelDestination = navigationActions::navigateTo,
@@ -155,13 +149,12 @@ private fun NanoNavigationWrapper(
                 contentType = contentType,
                 displayFeatures = displayFeatures,
                 navigationContentPosition = navigationContentPosition,
-                nanoHomeUIState = nanoHomeUIState,
                 navController = navController,
                 selectedDestination = selectedDestination,
                 navigateToTopLevelDestination = navigationActions::navigateTo,
                 closeDetailScreen = closeDetailScreen,
                 navigateToDetail = navigateToDetail,
-                onFABClicked = {}
+                onFABClicked = onFABClicked
             ) {
                 scope.launch {
                     drawerState.open()
@@ -178,7 +171,6 @@ fun NanoAppContent(
     contentType: NanoContentType,
     displayFeatures: List<DisplayFeature>,
     navigationContentPosition: NanoNavigationContentPosition,
-    nanoHomeUIState: NanoHomeUIState,
     navController: NavHostController,
     selectedDestination: String,
     navigateToTopLevelDestination: (NanoTopLevelDestination) -> Unit,
@@ -205,7 +197,6 @@ fun NanoAppContent(
                 navController = navController,
                 contentType = contentType,
                 displayFeatures = displayFeatures,
-                nanoHomeUIState = nanoHomeUIState,
                 navigationType = navigationType,
                 closeDetailScreen = closeDetailScreen,
                 navigateToDetail = navigateToDetail,
@@ -228,11 +219,10 @@ private fun NanoNavHost(
     navController: NavHostController,
     contentType: NanoContentType,
     displayFeatures: List<DisplayFeature>,
-    nanoHomeUIState: NanoHomeUIState,
     navigationType: NanoNavigationType,
     closeDetailScreen: () -> Unit,
     navigateToDetail: (Long, NanoContentType) -> Unit,
-    onFABClicked: () -> Unit = {}
+    onFABClicked: () -> Unit
 ) {
     NavHost(
         modifier = modifier,
@@ -240,7 +230,14 @@ private fun NanoNavHost(
         startDestination = NanoRoute.INBOX,
     ) {
         composable(NanoRoute.INBOX) {
-            Text(text = stringResource(id = R.string.tab_inbox))
+            NanoHomeRoute(
+                contentType = contentType,
+                displayFeatures = displayFeatures,
+                navigationType = navigationType,
+                closeDetailScreen = closeDetailScreen,
+                navigateToDetail = navigateToDetail,
+                onFABClicked = onFABClicked
+            )
         }
         composable(NanoRoute.ARTICLES) {
             Text(text = stringResource(id = R.string.tab_article))

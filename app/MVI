@@ -26,3 +26,13 @@ viewModel.container.sendEvent(SearchSingleEvent.ToastEventSearch)
 发送事件，我创了个SentEventDelegate委托类通过setValue来调用sendEvent，效果是
 var easyEvent by SentEventDelegate(viewModel.container)//委托
 easyEvent=SearchSingleEvent.ToastEventSearch //调用发送事件
+
+
+UI {
+    uiState
+    dispatch
+}
+
+VM {
+    dispatch --> (db, http, file, ...) --> uiState
+}
