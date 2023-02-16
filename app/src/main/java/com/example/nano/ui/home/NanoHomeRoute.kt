@@ -1,10 +1,18 @@
 package com.example.nano.ui.home
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,13 +32,11 @@ fun NanoHomeRoute(
     navigateToDetail: (Long, NanoContentType) -> Unit,
     onFABClicked: () -> Unit
 ) {
-    val homeViewModel: NanoHomeViewModel = viewModel(
-        factory = NanoHomeViewModel.provideFactory()
-    )
-    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val homeViewModel: NanoHomeViewModel = viewModel()
+    val uiState by homeViewModel.nanoHomeMvi.uiState.collectAsStateWithLifecycle()
     NanoHome(
         uiState = uiState,
-        dispatch = homeViewModel::dispatch,
+        dispatch = homeViewModel.nanoHomeMvi::dispatch,
         contentType = contentType,
         displayFeatures = displayFeatures,
         navigationType = navigationType,
@@ -51,12 +57,29 @@ fun NanoHome(
     navigateToDetail: (Long, NanoContentType) -> Unit,
     onFABClicked: () -> Unit
 ) {
-    TextButton(onClick = { dispatch(NanoHomeIntent.ShowMsg("1234")) }) {
-        Text(text = "show")
-    }
 
     if (!uiState.error.isNullOrEmpty()) {
         Toast.makeText(LocalContext.current, uiState.error, Toast.LENGTH_SHORT).show()
         dispatch(NanoHomeIntent.OnMsgShow)
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        AnimatedVisibility(visible = uiState.loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                CircularProgressIndicator()
+                TextButton(onClick = { dispatch(NanoHomeIntent.DismissProgress) }) {
+                    Text(text = "dismiss")
+                }
+            }
+        }
+        AnimatedVisibility(visible = !uiState.loading) {
+            TextButton(onClick = { dispatch(NanoHomeIntent.ShowProgress) }) {
+                Text(text = "show progress")
+            }
+        }
     }
 }

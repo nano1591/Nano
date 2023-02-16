@@ -1,53 +1,19 @@
 package com.example.nano.ui.viewModel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.nano.data.Email
-import com.example.nano.mvi.UIState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import com.example.nano.mvi.NanoMviWrapper
+import com.example.nano.mvi.UiIntent
+import com.example.nano.mvi.UiState
+import kotlinx.coroutines.flow.SharingStarted
 
 class NanoHomeViewModel : ViewModel() {
-    private val _nanoHomeIntent = MutableSharedFlow<NanoHomeIntent>()
-
-    val uiState =
-        _nanoHomeIntent
-            .toNewsStateFlow() // 将事件流转换成状态流
-            .flowOn(Dispatchers.IO) // 异步地进行变换操作
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                NanoHomeUIState(error = "0000")
-            ) // 将流转换成共享流以供界面订阅
-
-    fun dispatch(intent: NanoHomeIntent) {
-        viewModelScope.launch { _nanoHomeIntent.emit(intent) }
-    }
-
-    @OptIn(FlowPreview::class)
-    private fun Flow<NanoHomeIntent>.toNewsStateFlow(): Flow<NanoHomeUIState> = merge(
-        // 加载首页事件处理
-        filterIsInstance<NanoHomeIntent.ShowMsg>()
-            .flatMapConcat {
-                it.show(it)
-            },
-        filterIsInstance<NanoHomeIntent.OnMsgShow>()
-            .flatMapConcat {
-                it.dismissMsg()
-            },
+    val nanoHomeMvi = NanoMviWrapper<NanoHomeUIState, NanoHomeIntent>(
+        NanoHomeUIState(error = "0000", loading = true),
+        viewModelScope,
+        SharingStarted.Eagerly
     )
-
-    companion object {
-        fun provideFactory(): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return NanoHomeViewModel() as T
-            }
-        }
-    }
 }
 
 data class NanoHomeUIState(
@@ -56,14 +22,30 @@ data class NanoHomeUIState(
     val isDetailOnlyOpen: Boolean = false,
     val loading: Boolean = false,
     val error: String? = null
-) : UIState
+) : UiState
 
-sealed class NanoHomeIntent {
+sealed class NanoHomeIntent : UiIntent<NanoHomeUIState> {
     data class ShowMsg(val msg: String) : NanoHomeIntent() {
-        fun show(intent: ShowMsg) = flowOf(NanoHomeUIState().copy(error = intent.msg))
+        override suspend fun invoke(prev: NanoHomeUIState): NanoHomeUIState {
+            return prev.copy(error = this.msg)
+        }
     }
 
     object OnMsgShow : NanoHomeIntent() {
-        fun dismissMsg() = flowOf(NanoHomeUIState().copy(error = null))
+        override suspend fun invoke(prev: NanoHomeUIState): NanoHomeUIState {
+            return prev.copy(error = null)
+        }
+    }
+
+    object DismissProgress : NanoHomeIntent() {
+        override suspend fun invoke(prev: NanoHomeUIState): NanoHomeUIState {
+            return prev.copy(loading = false)
+        }
+    }
+
+    object ShowProgress : NanoHomeIntent() {
+        override suspend fun invoke(prev: NanoHomeUIState): NanoHomeUIState {
+            return prev.copy(loading = true)
+        }
     }
 }
