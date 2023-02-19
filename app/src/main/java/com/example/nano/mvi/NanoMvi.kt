@@ -1,67 +1,44 @@
 package com.example.nano.mvi
 
-import androidx.annotation.Keep
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
-@Keep
-// UI状态帧
-interface UiState
-
-@Keep
-// 单次UI事件
-interface UiIntent<S : UiState> {
-    suspend fun invoke(prev: S): S
-}
-
-interface NanoMvi<S : UiState, I : UiIntent<S>> {
-    val uiState: StateFlow<S>
-    fun dispatch(intent: I)
-}
-
-class NanoMviWrapper<S : UiState, I : UiIntent<S>>(
+fun <S : UiState, E : UiEvent, I : UiIntent, D : UiIntentDelegate<S>> ViewModel.nanoMvi(
     initialState: S,
-    private val parentScope: CoroutineScope,
-    started: SharingStarted = SharingStarted.Eagerly
-) : NanoMvi<S, I> {
-    private val uiIntent = MutableSharedFlow<I>()
-    override lateinit var uiState: StateFlow<S>
-
-    override fun dispatch(intent: I) {
-        parentScope.launch { uiIntent.emit(intent) }
-    }
-
-    init {
-        uiState = uiIntent
-            .map { it.invoke(this.uiState.value) }
-            .flowOn(Dispatchers.IO)
-            .stateIn(parentScope, started, initialState)
-    }
+    delegateIntent: Flow<I>.() -> Flow<D>,
+    started: SharingStarted = SharingStarted.Eagerly,
+    filterUiEvent: (p: D) -> E?
+): Lazy<NanoMvi<S, E, I>> {
+    return NanoMviDelegate(initialState, delegateIntent, filterUiEvent, viewModelScope, started)
 }
 
+class NanoMviDelegate<S : UiState, E : UiEvent, I : UiIntent, D : UiIntentDelegate<S>>(
+    initialState: S,
+    delegateIntent: Flow<I>.() -> Flow<D>,
+    private val filterUiEvent: (p: D) -> E?,
+    parentScope: CoroutineScope,
+    started: SharingStarted = SharingStarted.Eagerly
+) : Lazy<NanoMvi<S, E, I>> {
+    private val _uiIntent = MutableSharedFlow<I>()
+    private val _uiEvent = Channel<E>()
 
-//inline fun <S: UiState, reified I: UiIntent<S>> createNanoMvi(
-//    initialState: S,
-//    parentScope: CoroutineScope,
-//    started: SharingStarted = SharingStarted.Eagerly
-//): NanoMvi<S, I> {
-//    val uiIntent = MutableSharedFlow<I>()
-//    val uiState = uiIntent
-//        .map { it.invoke() }
-//        .flowOn(Dispatchers.IO)
-//        .stateIn(parentScope, started, initialState)
-//
-//    return NanoMviWrapper(uiState, uiIntent, parentScope)
-//}
-//
-//private class NanoMviWrapper<S: UiState, I: UiIntent<S>>(
-//    override val uiState: StateFlow<S>,
-//    private val uiIntent: MutableSharedFlow<I>,
-//    private val parentScope: CoroutineScope
-//): NanoMvi<S, I> {
-//    override fun dispatch(intent: I) {
-//        parentScope.launch { uiIntent.emit(intent) }
-//    }
-//}
+    private var cached: NanoMvi<S, E, I>? = null
+
+    override val value: NanoMvi<S, E, I> = cached ?: NanoMviWrapper(
+        uiState = _uiIntent
+            .delegateIntent() // intent -> delegate
+            .onEach { p -> filterUiEvent(p)?.let { _uiEvent.send(it) } } // delegate(event) -> event
+            .scan(initialState) { oldState, delegate -> delegate.invoke(oldState) } // delegate -> state
+            .flowOn(Dispatchers.IO)
+            .stateIn(parentScope, started, initialState),
+        uiEvent = _uiEvent.receiveAsFlow(),
+        uiIntent = _uiIntent,
+        parentScope = parentScope
+    ).also { cached = it }
+
+    override fun isInitialized(): Boolean = cached != null
+}
