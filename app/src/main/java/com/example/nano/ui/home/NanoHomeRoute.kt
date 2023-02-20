@@ -1,31 +1,33 @@
 package com.example.nano.ui.home
 
 import android.annotation.SuppressLint
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.layout.DisplayFeature
+import com.example.nano.data.Email
+import com.example.nano.data.MailboxType
+import com.example.nano.ui.NanoApplication
 import com.example.nano.ui.navigation.NanoContentType
 import com.example.nano.ui.navigation.NanoNavigationType
-import com.example.nano.ui.viewModel.NanoHomeEvent
-import com.example.nano.ui.viewModel.NanoHomeIntent
 import com.example.nano.ui.viewModel.NanoHomeState
 import com.example.nano.ui.viewModel.NanoHomeViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
+import java.util.*
 
 @Composable
 fun NanoHomeRoute(
@@ -36,12 +38,16 @@ fun NanoHomeRoute(
     navigateToDetail: (Long, NanoContentType) -> Unit,
     onFABClicked: () -> Unit
 ) {
-    val homeViewModel: NanoHomeViewModel = viewModel()
-    val uiState by homeViewModel.mvi.uiState.collectAsStateWithLifecycle()
+    val homeViewModel: NanoHomeViewModel = viewModel(
+        factory = NanoHomeViewModel.provideFactory(NanoApplication.emailRepository)
+    )
+    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     NanoHome(
         uiState = uiState,
-        uiEvent = homeViewModel.mvi.uiEvent,
-        dispatch = homeViewModel.mvi::dispatch,
+        add = homeViewModel::add,
+        delete = homeViewModel::delete,
+        view = homeViewModel::view,
+        onMsgShowed = homeViewModel::onMsgShowed,
         contentType = contentType,
         displayFeatures = displayFeatures,
         navigationType = navigationType,
@@ -55,8 +61,10 @@ fun NanoHomeRoute(
 @Composable
 fun NanoHome(
     uiState: NanoHomeState,
-    uiEvent: Flow<NanoHomeEvent>,
-    dispatch: (intent: NanoHomeIntent) -> Unit,
+    add: (Email) -> Unit,
+    delete: (Email) -> Unit,
+    view: (Email) -> Unit,
+    onMsgShowed: () -> Unit,
     contentType: NanoContentType,
     displayFeatures: List<DisplayFeature>,
     navigationType: NanoNavigationType,
@@ -64,16 +72,11 @@ fun NanoHome(
     navigateToDetail: (Long, NanoContentType) -> Unit,
     onFABClicked: () -> Unit
 ) {
-    rememberCoroutineScope().launch {
-        uiEvent.collect {
-            when (it) {
-                is NanoHomeEvent.Msg -> {
-                    Log.e("NanoHome", it.msg)
-                }
-            }
-        }
+    var eid by remember { mutableStateOf(1L) }
+    if (!uiState.error.isNullOrEmpty()) {
+        Toast.makeText(LocalContext.current, uiState.error, Toast.LENGTH_SHORT).show()
+        onMsgShowed()
     }
-
     Column(modifier = Modifier.fillMaxSize()) {
         AnimatedVisibility(visible = uiState.loading) {
             Box(
@@ -82,15 +85,45 @@ fun NanoHome(
                     .wrapContentSize(Alignment.Center)
             ) {
                 CircularProgressIndicator()
-                TextButton(onClick = { dispatch(NanoHomeIntent.ProgressDismiss) }) {
-                    Text(text = "dismiss")
+            }
+        }
+        AnimatedVisibility(visible = uiState.emails.isNotEmpty()) {
+            Column {
+                uiState.emails.map {
+                    Text(
+                        text = it.toString(),
+                        modifier = Modifier
+                            .background(
+                                if (it.viewAt !== null) MaterialTheme.colorScheme.inverseOnSurface
+                                else MaterialTheme.colorScheme.primaryContainer
+                            )
+                            .clickable { view(it) })
+                    TextButton(onClick = { delete(it) }) {
+                        Text(text = "delete")
+                    }
                 }
             }
         }
-        AnimatedVisibility(visible = !uiState.loading) {
-            TextButton(onClick = { dispatch(NanoHomeIntent.Progress) }) {
-                Text(text = "show progress")
-            }
+        TextButton(onClick = {
+            add(
+                Email(
+                    eid = eid,
+                    sender = 1L,
+                    recipients = listOf(1L, 2L),
+                    subject = "subject",
+                    body = "body",
+                    attachments = emptyList(),
+                    isImportant = false,
+                    isStarred = false,
+                    mailbox = MailboxType.INBOX,
+                    createdAt = Date(),
+                    threads = emptyList()
+                )
+            )
+            eid = ++eid
+        }) {
+            Text(text = "add")
         }
+
     }
 }
