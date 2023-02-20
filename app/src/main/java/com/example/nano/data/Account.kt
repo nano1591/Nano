@@ -1,16 +1,12 @@
 package com.example.nano.data
 
-import androidx.annotation.DrawableRes
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity
 data class Account(
-    val id: Long,
-    val uid: Long,
-    val surname: String,
+    @PrimaryKey val uid: Long,
     val name: String,
     val email: String,
-    val altEmail: String,
-    @DrawableRes val avatar: Int,
-    var isCurrentAccount: Boolean = false
-) {
-    val fullName: String = "$surname$name"
-}
+    val avatar: String
+)
