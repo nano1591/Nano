@@ -1,0 +1,38 @@
+GET（SELECT）：从服务器取出资源（一项或多项）
+POST（CREATE）：在服务器新建一个资源
+PUT（UPDATE）：在服务器更新资源（客户端提供改变后的完整资源）
+PATCH（UPDATE）：在服务器更新资源（客户端提供改变的属性）
+DELETE（DELETE）：从服务器删除资源
+
+?limit=10：指定返回记录的数量
+?offset=10：指定返回记录的开始位置。
+?page=2&per_page=100：指定第几页，以及每页的记录数。
+?sortby=name&order=asc：指定返回结果按照哪个属性排序，以及排序顺序。
+?animal_type_id=1：指定筛选条件
+
+1xx	信息，服务器收到请求，需要请求者继续执行操作
+2xx	成功，操作被成功接收并处理
+3xx	重定向，需要进一步的操作以完成请求
+4xx	客户端错误，请求包含语法错误或无法完成请求
+5xx	服务器错误，服务器在处理请求的过程中发生了错误
+
+200OK请求成功，一般用于GET和POST请求
+201Created请求成功并创建了新的资源，用于POST、PUT、PATCH请求。例如新增用户、修改用户信息等，同时在返回体中，我们既可以返回创建后实体的所有信息数据，也可以不返回相关信息。
+202Accepted已接受请求，但未处理完成，会在未来再处理，通常用于异步操作
+204No Content该状态码表示响应实体不包含任何数据，使用DELETE进行删除操作时，需返回该状态码
+
+400Bad Request客户端请求的语法错误，服务器无法理解
+401Unauthorized表示用户没有权限（令牌、用户名、密码错误）
+403Forbidden没有权限访问该请求，服务器收到请求但拒绝提供服务
+404Not Found服务器无法根据客户端的请求找到资源（如路径不存在）
+405Method Not Allowed客户端请求的方法服务端不支持，例如使用 POST 方法请求只支持 GET 方法的接口
+406Not Acceptable用户GET请求的格式不可得（比如用户请求 JSON 格式，但是只有 XML 格式）
+408Request Time-out客户端请求超时410Gone客户端GET请求的资源已经不存在。
+410 不同于 404，如果资源以前有现在被永久删除了可使用410 代码，网站设计人员可通过 301 代码指定资源的新位置
+415Unsupported Media Type通常表示服务器不支持客户端请求首部 Content-Type 指定的数据格式。如在只接受 JSON 格式的 API 中放入 XML 类型的数据并向服务器发送
+429Too Many Requests客户端的请求次数超过限额
+
+500	Internal Server Error	客户端请求有效，服务器处理时发生了意外
+503	Service Unavailable	服务器无法处理请求，一般用于网站维护状态
+
+https://developer.android.google.cn/training/id-auth/authenticate?hl=zh-cn

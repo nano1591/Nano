@@ -3,7 +3,7 @@ package com.example.nano.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.nano.data.Email
+import com.example.nano.data.model.Email
 import com.example.nano.data.repository.EmailRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*

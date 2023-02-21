@@ -1,10 +1,11 @@
-package com.example.nano.data
+package com.example.nano.data.dao
 
 import androidx.room.*
+import com.example.nano.data.model.Account
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface AccountDao {
+interface AccountLocalDao {
     @Query("select * from account")
     fun getAll(): Flow<List<Account>>
 
@@ -12,5 +13,5 @@ interface AccountDao {
     fun getAcct(vararg uid: Long): Flow<Account>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun update(vararg account: Account)
+    fun insert(vararg account: Account)
 }

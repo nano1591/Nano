@@ -20,8 +20,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.layout.DisplayFeature
-import com.example.nano.data.Email
-import com.example.nano.data.MailboxType
+import com.example.nano.data.model.Email
+import com.example.nano.data.model.MailboxType
 import com.example.nano.ui.NanoApplication
 import com.example.nano.ui.navigation.NanoContentType
 import com.example.nano.ui.navigation.NanoNavigationType
@@ -72,7 +72,7 @@ fun NanoHome(
     navigateToDetail: (Long, NanoContentType) -> Unit,
     onFABClicked: () -> Unit
 ) {
-    var eid by remember { mutableStateOf(1L) }
+    var eid by remember { mutableStateOf(1) }
     if (!uiState.error.isNullOrEmpty()) {
         Toast.makeText(LocalContext.current, uiState.error, Toast.LENGTH_SHORT).show()
         onMsgShowed()
@@ -108,8 +108,8 @@ fun NanoHome(
             add(
                 Email(
                     eid = eid,
-                    sender = 1L,
-                    recipients = listOf(1L, 2L),
+                    sender = 1,
+                    recipients = listOf(1, 2),
                     subject = "subject",
                     body = "body",
                     attachments = emptyList(),

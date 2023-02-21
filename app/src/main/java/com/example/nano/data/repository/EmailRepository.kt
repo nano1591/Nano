@@ -1,29 +1,29 @@
 package com.example.nano.data.repository
 
-import com.example.nano.data.Email
-import com.example.nano.data.EmailWrapper
-import com.example.nano.data.NanoDatabase
+import com.example.nano.data.dao.EmailLocalDao
+import com.example.nano.data.model.Email
+import com.example.nano.data.model.EmailWrapper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class EmailRepository(
-    private val db: NanoDatabase,
+    private val emailLocalDao: EmailLocalDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     suspend fun allEmailFromDB() = withContext(ioDispatcher) {
-        db.emailDao().getAll()
+        emailLocalDao.getAll()
             .map { emails ->
                 EmailWrapper(emails, true)
             }
     }
 
     suspend fun add(email: Email) = withContext(ioDispatcher) {
-        db.emailDao().insert(email)
+        emailLocalDao.insert(email)
     }
 
     suspend fun delete(email: Email) = withContext(ioDispatcher) {
-        db.emailDao().delete(email)
+        emailLocalDao.delete(email)
     }
 }

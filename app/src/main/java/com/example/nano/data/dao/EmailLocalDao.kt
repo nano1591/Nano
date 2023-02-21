@@ -1,11 +1,12 @@
-package com.example.nano.data
+package com.example.nano.data.dao
 
 import androidx.room.*
+import com.example.nano.data.model.Email
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface EmailDao {
-    @Query("select * from email order by viewAt, createdAt desc")
+interface EmailLocalDao {
+    @Query("select * from email order by updateAt, createdAt desc")
     fun getAll(): Flow<List<Email>>
 
     @Query("select * from email where eid = :eid")

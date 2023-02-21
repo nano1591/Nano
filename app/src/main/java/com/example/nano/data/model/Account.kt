@@ -1,12 +1,12 @@
-package com.example.nano.data
+package com.example.nano.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
 data class Account(
-    @PrimaryKey val uid: Long,
+    @PrimaryKey val uid: Int,
     val name: String,
-    val email: String,
+    val code: String,
     val avatar: String
 )

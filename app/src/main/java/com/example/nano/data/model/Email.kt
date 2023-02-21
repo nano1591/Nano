@@ -1,14 +1,15 @@
-package com.example.nano.data
+package com.example.nano.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.squareup.moshi.JsonClass
 import java.util.Date
 
 @Entity
 data class Email(
-    @PrimaryKey val eid: Long,
-    val sender: Long,
-    val recipients: List<Long>,
+    @PrimaryKey val eid: Int,
+    val sender: Int,
+    val recipients: List<Int>,
     val subject: String,
     val body: String,
     val attachments: List<EmailAttachment>,
@@ -18,7 +19,7 @@ data class Email(
     val createdAt: Date,
     val updateAt: Date? = null,
     val viewAt: Date? = null,
-    val threads: List<Long>
+    val threads: List<Int>
 )
 
 data class EmailWrapper(
@@ -30,6 +31,7 @@ enum class MailboxType {
     INBOX, DRAFTS, SENT, SPAM, TRASH
 }
 
+@JsonClass(generateAdapter = true)
 data class EmailAttachment(
     val resUrl: String,
     val contentDesc: String
