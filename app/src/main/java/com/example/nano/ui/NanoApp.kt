@@ -13,6 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,6 +25,8 @@ import com.example.nano.ui.navigation.*
 import kotlinx.coroutines.launch
 import com.example.nano.R
 import com.example.nano.ui.home.NanoHomeRoute
+import com.example.nano.ui.login.NanoLoginRoute
+import com.example.nano.ui.login.NanoUserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,14 +69,25 @@ fun NanoApp(
         }
     }
 
-    NanoNavigationWrapper(
-        navigationType = navigationType,
-        contentType = contentType,
-        displayFeatures = displayFeatures,
-        navigationContentPosition = navigationContentPosition
+    val userViewModel: NanoUserViewModel = viewModel(
+        factory = NanoUserViewModel.provideFactory(NanoApplication.accountRepository)
     )
-}
+    val uiState by userViewModel.uiState.collectAsStateWithLifecycle()
 
+//    if (uiState.isLogin) {
+//        NanoNavigationWrapper(
+//            navigationType = navigationType,
+//            contentType = contentType,
+//            displayFeatures = displayFeatures,
+//            navigationContentPosition = navigationContentPosition
+//        )
+//    } else {
+    NanoLoginRoute(
+        contentType = contentType,
+        displayFeatures = displayFeatures
+    )
+//    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

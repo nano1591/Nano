@@ -12,22 +12,11 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.example.nano.ui.theme.NanoTheme
 import com.google.accompanist.adaptive.calculateDisplayFeatures
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, DelicateCoroutinesApi::class)
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        GlobalScope.launch {
-            NanoApplication.accountRepository.register(
-                email = "email",
-                name = "name",
-                pwd = "pwd",
-                avatar = "avatar"
-            )
-        }
         setContent {
             NanoTheme {
                 val windowSize = calculateWindowSizeClass(this)

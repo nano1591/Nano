@@ -1,5 +1,7 @@
 package com.example.nano.data.dao
 
+import com.example.nano.data.HttpResult
+import retrofit2.http.DELETE
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
@@ -13,5 +15,8 @@ interface AccountHttpDao {
         @Field("name") name: String,
         @Field("pwd") pwd: String,
         @Field("avatar") avatar: String
-    ): String
+    ): HttpResult<String>
+
+    @DELETE("user")
+    suspend fun logout(): HttpResult<String>
 }

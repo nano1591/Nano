@@ -25,8 +25,6 @@ import com.example.nano.data.model.MailboxType
 import com.example.nano.ui.NanoApplication
 import com.example.nano.ui.navigation.NanoContentType
 import com.example.nano.ui.navigation.NanoNavigationType
-import com.example.nano.ui.viewModel.NanoHomeState
-import com.example.nano.ui.viewModel.NanoHomeViewModel
 import java.util.*
 
 @Composable

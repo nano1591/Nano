@@ -1,10 +1,11 @@
-package com.example.nano.ui.viewModel
+package com.example.nano.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.nano.data.model.Email
 import com.example.nano.data.repository.EmailRepository
+import com.example.nano.ui.utils.emitData
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -37,7 +38,7 @@ class NanoHomeViewModel(
         viewModelScope.launch {
             _uiState.emit(_uiState.value.copy(loading = true))
             emailRepository.allEmailFromDB().collect {
-                _uiState.emit(_uiState.value.copy(emails = it.emailList, loading = false))
+                _uiState.emitData { copy(emails = it.emailList, loading = false) }
             }
 //            flowOf(emailRepository.allEmailFromDB())
 //                .flattenMerge()
@@ -74,7 +75,7 @@ class NanoHomeViewModel(
     }
 
     fun onMsgShowed() {
-        viewModelScope.launch { _uiState.emit(_uiState.value.copy(error = "")) }
+        viewModelScope.launch { _uiState.emitData { copy(error = "") } }
     }
 
     companion object {

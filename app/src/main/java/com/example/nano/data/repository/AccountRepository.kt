@@ -1,23 +1,32 @@
 package com.example.nano.data.repository
 
-import android.util.Log
-import com.example.nano.data.dao.AccountLocalDao
+import com.example.nano.data.NanoResult
 import com.example.nano.data.dao.AccountHttpDao
+import com.example.nano.data.dao.AccountLocalDao
+import com.example.nano.data.dao.DataStoreDao
+import com.example.nano.data.exec
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class AccountRepository(
     private val accountHttpDao: AccountHttpDao,
     private val accountLocalDao: AccountLocalDao,
+    private val dataStoreDao: DataStoreDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
+    val isLogin = dataStoreDao.isLogin
+    val token = dataStoreDao.token
     suspend fun register(email: String, name: String, pwd: String, avatar: String) =
-        withContext(ioDispatcher) {
-            Log.d("register", accountHttpDao.register(email, name, pwd, avatar))
-            //        when (val result = accountHttpDao.register(email, name, pwd, avatar)) {
-//            is NanoResult.Success -> accountLocalDao.insert(result.data)
-//            is NanoResult.Error -> Log.e("register", result.exception.toString())
-//        }
+        exec { accountHttpDao.register(email, name, pwd, avatar) }.apply {
+            if (this is NanoResult.Success) {
+                dataStoreDao.setToken(data)
+            }
+        }
+
+    suspend fun logout() =
+        exec { accountHttpDao.logout() }.apply {
+            if (this is NanoResult.Success) {
+                dataStoreDao.setToken("")
+            }
         }
 }

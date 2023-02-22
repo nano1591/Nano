@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 fun initRetrofit(baseUrl: String): Retrofit {
-    val logger = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC }
+    val logger = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
     val httpClient = OkHttpClient
         .Builder()
         .addInterceptor(logger)
