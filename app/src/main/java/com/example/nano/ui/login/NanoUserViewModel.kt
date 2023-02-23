@@ -56,5 +56,7 @@ class NanoUserViewModel(
 
 data class NanoUserUiState(
     val isLogin: Boolean = false,
-    val loading: Boolean = false
+    val loading: Boolean = false,
+    val userAcct: String = "",
+    val userPwd: String = ""
 )

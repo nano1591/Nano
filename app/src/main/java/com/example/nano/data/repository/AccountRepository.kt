@@ -7,6 +7,7 @@ import com.example.nano.data.dao.DataStoreDao
 import com.example.nano.data.exec
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 
 class AccountRepository(
     private val accountHttpDao: AccountHttpDao,
@@ -14,7 +15,7 @@ class AccountRepository(
     private val dataStoreDao: DataStoreDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
-    val isLogin = dataStoreDao.isLogin
+    val isLogin = dataStoreDao.token.map { it.isNotEmpty() }
     val token = dataStoreDao.token
     suspend fun register(email: String, name: String, pwd: String, avatar: String) =
         exec { accountHttpDao.register(email, name, pwd, avatar) }.apply {

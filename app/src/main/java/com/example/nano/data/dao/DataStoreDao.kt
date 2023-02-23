@@ -11,7 +11,6 @@ class DataStoreDao(
 ) {
     val token = dataStore.data.map { it[KEY_TOKEN] ?: "" }
     suspend fun setToken(token: String) = dataStore.edit { it[KEY_TOKEN] = token }
-    val isLogin = token.map { it.isNotEmpty() }
 
     val userAccount = dataStore.data.map { it[KEY_USER_ACCOUNT] ?: "" }
     suspend fun setUserAccount(account: String) = dataStore.edit { it[KEY_USER_ACCOUNT] = account }
