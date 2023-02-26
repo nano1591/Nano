@@ -15,7 +15,7 @@
     <string name="edit">新建</string>
     <string name="compose">新建</string>
 
-    <string name="user_account">用户名</string>
+    <string name="user_account">账号</string>
     <string name="user_password">密码</string>
     <string name="user_login">登录</string>
     <string name="user_register">注册</string>

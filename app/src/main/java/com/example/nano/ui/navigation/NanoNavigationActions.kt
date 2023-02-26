@@ -4,7 +4,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
 class NanoNavigationActions(private val navController: NavHostController) {
-    fun navigateTo(destination: NanoTopLevelDestination) {
+    fun navigateTo(destination: NanoDestination) {
         navController.navigate(destination.route) {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true

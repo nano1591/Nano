@@ -69,9 +69,7 @@ fun NanoApp(
         }
     }
 
-    val userViewModel: NanoUserViewModel = viewModel(
-        factory = NanoUserViewModel.provideFactory(NanoApplication.accountRepository)
-    )
+    val userViewModel: NanoUserViewModel = viewModel()
     val uiState by userViewModel.uiState.collectAsStateWithLifecycle()
 
 //    if (uiState.isLogin) {
@@ -188,7 +186,7 @@ fun NanoAppContent(
     navigationContentPosition: NanoNavigationContentPosition,
     navController: NavHostController,
     selectedDestination: String,
-    navigateToTopLevelDestination: (NanoTopLevelDestination) -> Unit,
+    navigateToTopLevelDestination: (NanoDestination) -> Unit,
     closeDetailScreen: () -> Unit,
     navigateToDetail: (Long, NanoContentType) -> Unit,
     onFABClicked: () -> Unit = {},

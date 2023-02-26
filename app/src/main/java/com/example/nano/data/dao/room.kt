@@ -1,23 +1,21 @@
-package com.example.nano.data
+package com.example.nano.data.dao
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.example.nano.data.dao.AccountLocalDao
-import com.example.nano.data.dao.EmailLocalDao
-import com.example.nano.data.model.Account
-import com.example.nano.data.model.Email
-import com.example.nano.data.model.EmailAttachment
+import com.example.nano.data.Account
+import com.example.nano.data.Email
+import com.example.nano.data.EmailAttachment
 import com.example.nano.ui.utils.MoshiKit
 import java.util.*
 
 @Database(entities = [Account::class, Email::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
-abstract class NanoDatabase : RoomDatabase() {
-    abstract fun accountLocalDao(): AccountLocalDao
+abstract class DB : RoomDatabase() {
+    abstract fun acct(): AccountDao
 
-    abstract fun emailLocalDao(): EmailLocalDao
+    abstract fun email(): EmailDao
 }
 
 class Converters {

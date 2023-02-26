@@ -1,4 +1,4 @@
-package com.example.nano.data.model
+package com.example.nano.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -65,7 +65,7 @@ fun NanoNavigationVerticalArrangementLayout(
 fun NanoNavigationRail(
     selectedDestination: String,
     navigationContentPosition: NanoNavigationContentPosition,
-    navigateToTopLevelDestination: (NanoTopLevelDestination) -> Unit,
+    navigateToTopLevelDestination: (NanoDestination) -> Unit,
     onDrawerClicked: () -> Unit = {},
     onFABClicked: () -> Unit = {}
 ) {
@@ -137,7 +137,7 @@ fun NanoNavigationRail(
 @Composable
 fun NanoBottomNavigationBar(
     selectedDestination: String,
-    navigateToTopLevelDestination: (NanoTopLevelDestination) -> Unit
+    navigateToTopLevelDestination: (NanoDestination) -> Unit
 ) {
     NavigationBar(modifier = Modifier.fillMaxWidth()) {
         TOP_LEVEL_DESTINATIONS.forEach { nanoDestination ->
@@ -162,7 +162,7 @@ fun NanoBottomNavigationBar(
 fun PermanentNavigationDrawerContent(
     selectedDestination: String,
     navigationContentPosition: NanoNavigationContentPosition,
-    navigateToTopLevelDestination: (NanoTopLevelDestination) -> Unit,
+    navigateToTopLevelDestination: (NanoDestination) -> Unit,
     onFABClicked: () -> Unit = {}
 ) {
     PermanentDrawerSheet(modifier = Modifier.sizeIn(minWidth = 200.dp, maxWidth = 300.dp)) {
@@ -244,7 +244,7 @@ fun PermanentNavigationDrawerContent(
 fun ModalNavigationDrawerContent(
     selectedDestination: String,
     navigationContentPosition: NanoNavigationContentPosition,
-    navigateToTopLevelDestination: (NanoTopLevelDestination) -> Unit,
+    navigateToTopLevelDestination: (NanoDestination) -> Unit,
     onDrawerClicked: () -> Unit = {},
     onFABClicked: () -> Unit = {}
 ) {

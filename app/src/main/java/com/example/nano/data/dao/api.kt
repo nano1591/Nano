@@ -1,22 +1,23 @@
 package com.example.nano.data.dao
 
 import com.example.nano.data.HttpResult
-import retrofit2.http.DELETE
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
+import retrofit2.http.*
 
-interface AccountHttpDao {
+interface Api {
     // 注册用户
     @FormUrlEncoded
-    @POST("user")
+    @POST("users")
     suspend fun register(
-        @Field("code") code: String,
+        @Field("acct") acct: String,
         @Field("name") name: String,
         @Field("pwd") pwd: String,
         @Field("avatar") avatar: String
     ): HttpResult<String>
 
-    @DELETE("user")
-    suspend fun logout(): HttpResult<String>
+    @FormUrlEncoded
+    @PUT("users")
+    suspend fun login(
+        @Field("acct") acct: String,
+        @Field("pwd") pwd: String
+    ): HttpResult<String>
 }

@@ -20,9 +20,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.layout.DisplayFeature
-import com.example.nano.data.model.Email
-import com.example.nano.data.model.MailboxType
-import com.example.nano.ui.NanoApplication
+import com.example.nano.data.Email
+import com.example.nano.data.MailboxType
 import com.example.nano.ui.navigation.NanoContentType
 import com.example.nano.ui.navigation.NanoNavigationType
 import java.util.*
@@ -36,9 +35,7 @@ fun NanoHomeRoute(
     navigateToDetail: (Long, NanoContentType) -> Unit,
     onFABClicked: () -> Unit
 ) {
-    val homeViewModel: NanoHomeViewModel = viewModel(
-        factory = NanoHomeViewModel.provideFactory(NanoApplication.emailRepository)
-    )
+    val homeViewModel: NanoHomeViewModel = viewModel()
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     NanoHome(
         uiState = uiState,

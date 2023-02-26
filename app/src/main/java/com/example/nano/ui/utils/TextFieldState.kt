@@ -6,10 +6,10 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 
 open class TextFieldState(
-    private val validator: (String) -> Boolean = { true },
-    private val errorFor: (String) -> String = { "" }
+    private val defaultText: String = "",
+    private val validators: List<(String) -> String?> = emptyList(),
 ) {
-    var text: String by mutableStateOf("")
+    var text: String by mutableStateOf(defaultText)
     var isFocusedDirty: Boolean by mutableStateOf(false)
     var isFocused: Boolean by mutableStateOf(false)
     private var displayErrors: Boolean by mutableStateOf(false)
@@ -22,29 +22,21 @@ open class TextFieldState(
         if (focused) isFocusedDirty = true
     }
 
-    fun enableShowErrors() {
-        if (isFocusedDirty) {
-            displayErrors = true
-        }
-    }
-
     fun showErrors() = !isValid && displayErrors
 
     open fun getError(): String? {
         return if (showErrors()) {
-            errorFor(text)
+            errMsg
         } else {
             null
         }
     }
-}
 
-fun textFieldStateSaver(state: TextFieldState) = listSaver<TextFieldState, Any>(
-    save = { listOf(it.text, it.isFocusedDirty) },
-    restore = {
-        state.apply {
-            text = it[0] as String
-            isFocusedDirty = it[1] as Boolean
+    private fun validator(): String? = {
+        validators.find { validator ->
+            validator(text).isNotEmpty()
+        }?.let {
+
         }
     }
-)
+}

@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.map
 
-class DataStoreDao(
+class SP(
     private val dataStore: DataStore<Preferences>
 ) {
     val token = dataStore.data.map { it[KEY_TOKEN] ?: "" }

@@ -1,14 +1,8 @@
 package com.example.nano.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Article
-import androidx.compose.material.icons.outlined.ChatBubbleOutline
-import androidx.compose.material.icons.outlined.Inbox
-import androidx.compose.material.icons.outlined.People
-import androidx.compose.material.icons.rounded.Article
-import androidx.compose.material.icons.rounded.Chat
-import androidx.compose.material.icons.rounded.Inbox
-import androidx.compose.material.icons.rounded.People
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.nano.R
 
@@ -31,35 +25,38 @@ object NanoRoute {
     const val ARTICLES = "Articles"
     const val DM = "DirectMessages"
     const val GROUPS = "Groups"
+
+    const val LOGIN = "login"
+    const val REGISTER = "register"
 }
 
-data class NanoTopLevelDestination(
+data class NanoDestination(
     val route: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    val iconTextId: Int
+    val selectedIcon: ImageVector = Icons.Rounded.Login,
+    val unselectedIcon: ImageVector = Icons.Outlined.Login,
+    val iconTextId: Int = 0
 )
 
 val TOP_LEVEL_DESTINATIONS = listOf(
-    NanoTopLevelDestination(
+    NanoDestination(
         route = NanoRoute.INBOX,
         selectedIcon = Icons.Rounded.Inbox,
         unselectedIcon = Icons.Outlined.Inbox,
         iconTextId = R.string.tab_inbox
     ),
-    NanoTopLevelDestination(
+    NanoDestination(
         route = NanoRoute.ARTICLES,
         selectedIcon = Icons.Rounded.Article,
         unselectedIcon = Icons.Outlined.Article,
         iconTextId = R.string.tab_article
     ),
-    NanoTopLevelDestination(
+    NanoDestination(
         route = NanoRoute.DM,
         selectedIcon = Icons.Rounded.Chat,
         unselectedIcon = Icons.Outlined.ChatBubbleOutline,
         iconTextId = R.string.tab_dm
     ),
-    NanoTopLevelDestination(
+    NanoDestination(
         route = NanoRoute.GROUPS,
         selectedIcon = Icons.Rounded.People,
         unselectedIcon = Icons.Outlined.People,
