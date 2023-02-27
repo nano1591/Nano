@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -24,40 +23,34 @@ import androidx.compose.ui.unit.dp
 import com.example.nano.ui.utils.TextFieldState
 import com.example.nano.R
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PasswordTextField(
+fun PasswordInput(
     label: String,
-    passwordState: TextFieldState,
+    state: TextFieldState,
     modifier: Modifier = Modifier,
-    imeAction: ImeAction = ImeAction.Done,
-    onImeAction: () -> Unit = {}
+    showErrorOnFirst: Boolean = false,
+    imeAction: ImeAction = ImeAction.Done
 ) {
     val showPassword = rememberSaveable { mutableStateOf(false) }
     OutlinedTextField(
-        value = passwordState.text,
+        value = state.text,
         onValueChange = {
-            passwordState.text = it
-            passwordState.enableShowErrors()
+            state.text = it
+            if (showErrorOnFirst) state.enableShowErrors()
         },
         modifier = modifier
             .fillMaxWidth()
             .onFocusChanged { focusState ->
-                passwordState.onFocusChange(focusState.isFocused)
+                state.onFocusChange(focusState.isFocused)
                 if (!focusState.isFocused) {
-                    passwordState.enableShowErrors()
+                    state.enableShowErrors()
                 }
             },
-        textStyle = MaterialTheme.typography.bodyMedium,
-        label = {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        },
+        maxLines = 1,
+        label = { Text(text = label) },
         trailingIcon = {
-            if (passwordState.isFocused) {
+            if (state.isFocus) {
                 if (showPassword.value) {
                     IconButton(onClick = { showPassword.value = false }) {
                         Icon(
@@ -78,21 +71,52 @@ fun PasswordTextField(
         visualTransformation = if (showPassword.value) {
             VisualTransformation.None
         } else {
-            PasswordVisualTransformation()
+            PasswordVisualTransformation('\u2B50')
         },
-        isError = passwordState.showErrors(),
+        isError = state.isError(),
         supportingText = {
-            passwordState.getError()?.let { error -> TextFieldError(textError = error) }
+            state.getError()?.let { error -> TextFieldError(textError = error) }
         },
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = imeAction,
             keyboardType = KeyboardType.Password
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                onImeAction()
-            }
-        ),
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TextInput(
+    label: String,
+    state: TextFieldState,
+    modifier: Modifier = Modifier,
+    showErrorOnFirst: Boolean = false,
+    imeAction: ImeAction = ImeAction.Done
+) {
+    OutlinedTextField(
+        value = state.text,
+        onValueChange = {
+            state.text = it
+            if (showErrorOnFirst) state.enableShowErrors()
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .onFocusChanged { focusState ->
+                state.onFocusChange(focusState.isFocused)
+                if (!focusState.isFocused) {
+                    state.enableShowErrors()
+                }
+            },
+        maxLines = 1,
+        label = { Text(text = label) },
+        isError = state.isError(),
+        supportingText = {
+            state.getError()?.let { error -> TextFieldError(textError = error) }
+        },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = imeAction,
+            keyboardType = KeyboardType.Text
+        )
     )
 }
 

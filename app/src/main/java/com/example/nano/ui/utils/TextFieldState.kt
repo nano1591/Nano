@@ -2,7 +2,6 @@ package com.example.nano.ui.utils
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 
 open class TextFieldState(
@@ -10,33 +9,38 @@ open class TextFieldState(
     private val validators: List<(String) -> String?> = emptyList(),
 ) {
     var text: String by mutableStateOf(defaultText)
-    var isFocusedDirty: Boolean by mutableStateOf(false)
-    var isFocused: Boolean by mutableStateOf(false)
+    var isFocusedOnce: Boolean by mutableStateOf(false)
+    var isFocus: Boolean by mutableStateOf(false)
     private var displayErrors: Boolean by mutableStateOf(false)
 
     open val isValid: Boolean
-        get() = validator(text)
+        get() = validator()?.isEmpty() ?: true
 
     fun onFocusChange(focused: Boolean) {
-        isFocused = focused
-        if (focused) isFocusedDirty = true
+        isFocus = focused
+        if (focused) isFocusedOnce = true
     }
 
-    fun showErrors() = !isValid && displayErrors
+    fun enableShowErrors() {
+        if (isFocusedOnce) {
+            displayErrors = true
+        }
+    }
+
+    fun isError() = !isValid && displayErrors
 
     open fun getError(): String? {
-        return if (showErrors()) {
-            errMsg
+        return if (isError()) {
+            validator()
         } else {
             null
         }
     }
 
-    private fun validator(): String? = {
+    private fun validator() =
         validators.find { validator ->
-            validator(text).isNotEmpty()
+            validator(text)?.isNotEmpty() ?: false
         }?.let {
-
+            it(text)
         }
-    }
 }

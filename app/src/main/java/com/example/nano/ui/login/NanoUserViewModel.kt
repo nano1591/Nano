@@ -38,20 +38,22 @@ class NanoUserViewModel @Inject constructor(
         }
     }
 
-    fun register() {
+    fun register(acct: String, name: String, pwd: String, avatar: String) {
         viewModelScope.launch {
             api.register(
-                acct = "email",
-                name = "name",
-                pwd = "pwd",
-                avatar = "avatar"
+                acct = acct,
+                name = name,
+                pwd = pwd,
+                avatar = avatar
             )
+            _uiState.emitData { copy(userAcct = acct, userPwd = pwd) }
         }
     }
 
     fun login(acct: String, pwd: String) {
         viewModelScope.launch {
             api.login(acct, pwd)
+            _uiState.emitData { copy(userAcct = acct, userPwd = pwd) }
         }
     }
 }
