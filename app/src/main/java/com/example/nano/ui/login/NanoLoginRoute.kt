@@ -1,6 +1,7 @@
 package com.example.nano.ui.login
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,19 +15,13 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.window.layout.DisplayFeature
 import com.example.nano.R
 import com.example.nano.ui.navigation.NanoContentType
-import com.example.nano.ui.navigation.NanoDestination
-import com.example.nano.ui.navigation.NanoNavigationActions
-import com.example.nano.ui.navigation.NanoRoute
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType")
 @Composable
 fun NanoLoginRoute(
@@ -36,64 +31,34 @@ fun NanoLoginRoute(
     val userViewModel: NanoUserViewModel = viewModel()
     val uiState by userViewModel.uiState.collectAsStateWithLifecycle()
 
-    val navController = rememberNavController()
-    val navigationActions = remember(navController) {
-        NanoNavigationActions(navController)
+    val showRegisterCard = remember {
+        mutableStateOf(false)
     }
-    NanoLoginNavHost(
-        navController = navController,
-        contentType = contentType,
-        displayFeatures = displayFeatures,
-        uiState = uiState,
-        navigateToRegister = {
-            navigationActions.navigateTo(NanoDestination(route = NanoRoute.REGISTER))
-        },
-        goBack = {
-            navigationActions.navigateTo(NanoDestination(route = NanoRoute.LOGIN))
-        },
-        login = userViewModel::login,
-        register = userViewModel::register
-    )
-}
 
-@Composable
-fun NanoLoginNavHost(
-    navController: NavHostController,
-    contentType: NanoContentType,
-    displayFeatures: List<DisplayFeature>,
-    uiState: NanoUserUiState,
-    navigateToRegister: () -> Unit,
-    goBack: () -> Unit,
-    login: (String, String) -> Unit,
-    register: (String, String, String, String) -> Unit
-) {
-    NavHost(
-        modifier = Modifier.fillMaxSize(),
-        navController = navController,
-        startDestination = NanoRoute.LOGIN
+    NanoLoginPageRoute(
+        contentType = contentType,
+        displayFeatures = displayFeatures
     ) {
-        composable(NanoRoute.LOGIN) {
-            NanoLoginPageRoute(
-                contentType = contentType,
-                displayFeatures = displayFeatures
-            ) {
-                NanoLoginContext(
-                    uiState = uiState,
-                    navigateToRegister = navigateToRegister,
-                    login = login
-                )
-            }
-        }
-        composable(NanoRoute.REGISTER) {
+        NanoLoginContext(
+            uiState = uiState,
+            toRegister = { showRegisterCard.value = true },
+            login = userViewModel::login,
+        )
+    }
+
+    if (showRegisterCard.value) {
+        ModalBottomSheet(
+            onDismissRequest = { showRegisterCard.value = false },
+            modifier = Modifier.padding(8.dp)
+        ) {
             NanoRegisterRoute(
-                contentType = contentType,
-                uiState = uiState,
-                goBack = goBack,
-                register = register
+                close = { showRegisterCard.value = false },
+                register = userViewModel::register
             )
         }
     }
 }
+
 
 @Composable
 fun NanoLoginPageRoute(
@@ -111,7 +76,7 @@ fun NanoLoginPageRoute(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = 16.dp),
         ) {
             Image(
                 painter = painterResource(id = R.drawable.nano),
@@ -123,7 +88,6 @@ fun NanoLoginPageRoute(
             )
             Column(
                 modifier = Modifier
-                    .sizeIn(maxWidth = 400.dp)
                     .align(Alignment.Center)
             ) {
                 context()
@@ -162,8 +126,7 @@ fun NanoLoginTwoPane(
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .padding(end = 64.dp)
-                    .sizeIn(maxWidth = 400.dp),
+                    .padding(end = 64.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

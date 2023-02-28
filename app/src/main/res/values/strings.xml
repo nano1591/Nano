@@ -19,6 +19,8 @@
     <string name="user_password">密码</string>
     <string name="user_login">登录</string>
     <string name="user_register">注册</string>
+    <string name="user_name">昵称</string>
+    <string name="user_confirm_pwd">确认密码</string>
 
     <string name="dismiss">取消</string>
 

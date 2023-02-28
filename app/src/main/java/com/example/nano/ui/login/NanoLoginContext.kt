@@ -1,11 +1,10 @@
 package com.example.nano.ui.login
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -20,7 +19,7 @@ import com.example.nano.ui.utils.Validators
 @Composable
 fun NanoLoginContext(
     uiState: NanoUserUiState,
-    navigateToRegister: () -> Unit,
+    toRegister: () -> Unit,
     login: (String, String) -> Unit
 ) {
     val acct = remember {
@@ -48,7 +47,6 @@ fun NanoLoginContext(
     TextInput(
         label = stringResource(id = R.string.user_account),
         state = acct,
-        showErrorOnFirst = true,
         imeAction = ImeAction.Next
     )
     Spacer(modifier = Modifier.height(16.dp))
@@ -58,24 +56,19 @@ fun NanoLoginContext(
     )
     Spacer(modifier = Modifier.height(16.dp))
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxWidth()
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp)
     ) {
         TextButton(
-            onClick = { navigateToRegister() },
-            modifier = Modifier
-                .weight(1F)
-                .alignByBaseline()
+            onClick = { toRegister() },
         ) {
             Text(text = stringResource(id = R.string.user_register))
         }
-        ElevatedButton(
+        Button(
             onClick = { login(acct.text, pwd.text) },
             enabled = acct.isValid && pwd.isValid,
-            modifier = Modifier
-                .weight(1.617F)
-                .alignByBaseline(),
-            contentPadding = PaddingValues(4.dp)
         ) {
             Text(text = stringResource(id = R.string.user_login))
         }

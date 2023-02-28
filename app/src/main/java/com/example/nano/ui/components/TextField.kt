@@ -1,9 +1,6 @@
 package com.example.nano.ui.components
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -41,6 +38,7 @@ fun PasswordInput(
         },
         modifier = modifier
             .fillMaxWidth()
+            .sizeIn(maxWidth = 300.dp)
             .onFocusChanged { focusState ->
                 state.onFocusChange(focusState.isFocused)
                 if (!focusState.isFocused) {
@@ -101,6 +99,7 @@ fun TextInput(
         },
         modifier = modifier
             .fillMaxWidth()
+            .sizeIn(maxWidth = 300.dp)
             .onFocusChanged { focusState ->
                 state.onFocusChange(focusState.isFocused)
                 if (!focusState.isFocused) {

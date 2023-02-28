@@ -25,9 +25,6 @@ object NanoRoute {
     const val ARTICLES = "Articles"
     const val DM = "DirectMessages"
     const val GROUPS = "Groups"
-
-    const val LOGIN = "login"
-    const val REGISTER = "register"
 }
 
 data class NanoDestination(
