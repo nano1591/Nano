@@ -30,9 +30,9 @@ class NanoUserViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            sp.token.collect {
+            sp.token.get().collect {
                 _uiState.emitData {
-                    copy(isLogin = it.isNotEmpty())
+                    copy(isLogin = !it.isNullOrEmpty())
                 }
             }
         }

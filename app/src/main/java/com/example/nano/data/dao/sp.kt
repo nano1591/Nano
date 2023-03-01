@@ -9,18 +9,17 @@ import kotlinx.coroutines.flow.map
 class SP(
     private val dataStore: DataStore<Preferences>
 ) {
-    val token = dataStore.data.map { it[KEY_TOKEN] ?: "" }
-    suspend fun setToken(token: String) = dataStore.edit { it[KEY_TOKEN] = token }
+    val token = SpColumn(stringPreferencesKey("login_token"))
 
-    val userAccount = dataStore.data.map { it[KEY_USER_ACCOUNT] ?: "" }
-    suspend fun setUserAccount(account: String) = dataStore.edit { it[KEY_USER_ACCOUNT] = account }
+    val userAccount = SpColumn(stringPreferencesKey("user_account"))
 
-    val userPassword = dataStore.data.map { it[KEY_USER_PASSWORD] ?: "" }
-    suspend fun setUserPassword(pwd: String) = dataStore.edit { it[KEY_USER_PASSWORD] = pwd }
+    val userPassword = SpColumn(stringPreferencesKey("user_password"))
 
-    companion object {
-        val KEY_TOKEN = stringPreferencesKey("login_token")
-        val KEY_USER_ACCOUNT = stringPreferencesKey("user_account")
-        val KEY_USER_PASSWORD = stringPreferencesKey("user_password")
+    inner class SpColumn<T>(private val KEY: Preferences.Key<T>) {
+        fun get() = dataStore.data.map { it[KEY] }
+        suspend fun set(value: T) = dataStore.edit { it[KEY] = value }
     }
+
+    // TODO list数据的保存
 }
+

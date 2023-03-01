@@ -18,10 +18,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.layout.DisplayFeature
 import com.example.nano.R
 import com.example.nano.ui.navigation.NanoContentType
+import com.example.nano.ui.utils.TextFieldState
+import com.example.nano.ui.utils.Validators
+import com.example.nano.ui.utils.slideInBottomEnd
+import com.example.nano.ui.utils.slideOutBottomEnd
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType")
 @Composable
 fun NanoLoginRoute(
@@ -31,7 +34,7 @@ fun NanoLoginRoute(
     val userViewModel: NanoUserViewModel = viewModel()
     val uiState by userViewModel.uiState.collectAsStateWithLifecycle()
 
-    val showRegisterCard = remember {
+    val showRegister = remember {
         mutableStateOf(false)
     }
 
@@ -41,24 +44,89 @@ fun NanoLoginRoute(
     ) {
         NanoLoginContext(
             uiState = uiState,
-            toRegister = { showRegisterCard.value = true },
+            toRegister = { showRegister.value = true },
             login = userViewModel::login,
         )
     }
 
-    if (showRegisterCard.value) {
-        ModalBottomSheet(
-            onDismissRequest = { showRegisterCard.value = false },
-            modifier = Modifier.padding(8.dp)
+    AnimatedVisibility(
+        visible = showRegister.value,
+        enter = slideInBottomEnd(),
+        exit = slideOutBottomEnd()
+    ) {
+        NanoRegisterPageRoute(
+            contentType = contentType,
+            register = userViewModel::register
         ) {
-            NanoRegisterRoute(
-                close = { showRegisterCard.value = false },
-                register = userViewModel::register
-            )
+            showRegister.value = false
         }
     }
 }
 
+@Composable
+fun NanoRegisterPageRoute(
+    contentType: NanoContentType,
+    register: (String, String, String, String) -> Unit,
+    goBack: () -> Unit
+) {
+    val acct = remember {
+        TextFieldState(
+            "",
+            Validators()
+                .required()
+                .minLength(6)
+                .maxLength(12)
+                .word()
+                .merge()
+        )
+    }
+    val name = remember {
+        TextFieldState(
+            "",
+            Validators()
+                .required()
+                .minLength(2)
+                .maxLength(12)
+                .word()
+                .merge()
+        )
+    }
+    val pwd = remember {
+        TextFieldState(
+            "",
+            Validators()
+                .required()
+                .minLength(6)
+                .maxLength(16)
+                .word()
+                .merge()
+        )
+    }
+    val confirmPwd = remember {
+        TextFieldState("", Validators().equal(pwd).merge())
+    }
+
+    // TODO 点击×的时候，检查有没有输入值，有的话提示丢弃弹窗
+    if (contentType == NanoContentType.SINGLE_PANE) {
+        NanoRegisterFullDialog(
+            acct = acct,
+            name = name,
+            pwd = pwd,
+            confirmPwd = confirmPwd,
+            register = register,
+            goBack = goBack
+        )
+    } else {
+        NanoRegisterDialog(
+            acct = acct,
+            name = name,
+            pwd = pwd,
+            confirmPwd = confirmPwd,
+            register = register,
+            goBack = goBack
+        )
+    }
+}
 
 @Composable
 fun NanoLoginPageRoute(
